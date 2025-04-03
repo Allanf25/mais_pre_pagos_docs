@@ -1,7 +1,7 @@
 
 openapi: 3.0.0
 info:
-  title: API Hestia - Mais Pré Pagos
+  title: API Mais Pré Pagos - Mais Pré Pagos
   description: API para intermediação de pagamentos entre premiadores e premiados.
   version: "1.0.0"
 
