@@ -74,6 +74,10 @@ components:
       properties:
         cpfcnpj:
           type: string
+        codigo_premiador:
+          type: string
+        codigo_premiado:
+          type: string
         nome:
           type: string
         id_referencia:
@@ -85,8 +89,8 @@ components:
           enum: [ted, pix, doc]
         dados_do_pagamento:
           oneOf:
-            - $ref: '#/components/schemas/DadosPagamentoBancario'
-            - $ref: '#/components/schemas/DadosPagamentoPix'
+            - $ref: "#/components/schemas/DadosPagamentoBancario"
+            - $ref: "#/components/schemas/DadosPagamentoPix"
 
     Premiador:
       type: object
@@ -94,19 +98,29 @@ components:
         - cnpj_premiador
         - id_referencia
         - premiados
-        - valor_total
       properties:
         cnpj_premiador:
           type: string
         id_referencia:
           type: string
-        valor_total:
-          type: number
-          format: float
         premiados:
           type: array
           items:
-            $ref: '#/components/schemas/Premiado'
+            $ref: "#/components/schemas/Premiado"
+
+    EnvioPremiacoesRequest:
+      type: object
+      required:
+        - valor_total
+        - premiadores
+      properties:
+        valor_total:
+          type: number
+          format: float
+        premiadores:
+          type: array
+          items:
+            $ref: "#/components/schemas/Premiador"
 
     ProtocoloStatus:
       type: object
@@ -147,14 +161,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AuthRequest'
+              $ref: "#/components/schemas/AuthRequest"
       responses:
-        '200':
+        "200":
           description: Token JWT gerado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
+                $ref: "#/components/schemas/AuthResponse"
 
   /hestia/premiações:
     post:
@@ -166,12 +180,10 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/Premiador'
+              $ref: "#/components/schemas/EnvioPremiacoesRequest"
       responses:
-        '200':
-          description: Retorno com protocolos por premiador
+        "200":
+          description: Resposta com os protocolos de premiação
           content:
             application/json:
               schema:
@@ -179,12 +191,32 @@ paths:
                 properties:
                   status:
                     type: string
+                    enum: [success, error]
+                    example: "success"
                   mensagem:
                     type: string
+                    example: "Requisição processada com sucesso"
                   protocolos:
                     type: array
                     items:
-                      $ref: '#/components/schemas/ProtocoloStatus'
+                      type: object
+                      properties:
+                        id_referencia:
+                          type: string
+                          example: "ref_premio_001"
+                        cnpj_premiador:
+                          type: string
+                          example: "12345678000199"
+                        protocolo:
+                          type: string
+                          example: "abc123def001"
+                        status:
+                          type: string
+                          enum: [success, error, pendente]
+                          example: "pendente"
+                        mensagem:
+                          type: string
+                          example: "Premiação em processamento"
 
     get:
       security:
@@ -197,9 +229,9 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Status da premiação
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProtocoloStatus'
+                $ref: "#/components/schemas/ProtocoloStatus"
